@@ -2,9 +2,9 @@
 
 Lightweight function that abstracts sending an html email using Postmark's REST API via cURL:
 
-[https://postmarkapp.com/developer/api/overview](https://postmarkapp.com/developer/api/overview)
-[https://postmarkapp.com/developer/api/email-api](https://postmarkapp.com/developer/api/email-api)
-[https://postmarkapp.com/developer/user-guide/send-email-with-api](https://postmarkapp.com/developer/user-guide/send-email-with-api)
+* [https://postmarkapp.com/developer/api/overview](https://postmarkapp.com/developer/api/overview)
+* [https://postmarkapp.com/developer/api/email-api](https://postmarkapp.com/developer/api/email-api)
+* [https://postmarkapp.com/developer/user-guide/send-email-with-api](https://postmarkapp.com/developer/user-guide/send-email-with-api)
 
 ## Sample Usage
 
