@@ -1,6 +1,8 @@
 <?php
 
 /**
+* https://github.com/jrmro/postmark/
+* 
 * Lightweight function that abstracts sending an html email using Postmark's REST API via cURL:
 * https://postmarkapp.com/developer/api/overview
 * https://postmarkapp.com/developer/api/email-api
@@ -27,7 +29,7 @@
 * ]);
 *
 * @author     Joseph Romero
-* @version    1.0
+* @version    1.1
 * ...
 */
 
@@ -60,7 +62,7 @@ if ( ! function_exists('postmark'))
 				if(empty($params[$required])) $missing_params[] = $required;
 			}
 				
-			if( ! empty($missing_params)) return array('error' => true, 'message' => 'The following required parameters are missing: ' . implode(', ', $missing_params));
+			if( ! empty($missing_params)) return array('error' => true, 'message' => 'The following required parameters are missing: ' . implode(', ', $missing_params), 'status' => 0);
 
 
 		// Parse Recipients
@@ -69,7 +71,7 @@ if ( ! function_exists('postmark'))
 
 				if( isset($params[$recipients]) ){
 
-					if( ! is_array($params[$recipients]) ) return array('error' => true, 'message' => "'{$recipients}' email address(es) must be specified in an array.");
+					if( ! is_array($params[$recipients]) ) return array('error' => true, 'message' => "'{$recipients}' email address(es) must be specified in an array.", 'status' => 0);
 
 					// Convert to string. Multiple addresses are comma-separated.
 					$params[$recipients] = implode(',', $params[$recipients]);
@@ -100,12 +102,12 @@ if ( ! function_exists('postmark'))
 			if( isset($params['attachments']) )
 			{
 
-				if( ! is_array($params['attachments']) ) return array('error' => true, 'message' => 'Attachments must be included in an array.');
+				if( ! is_array($params['attachments']) ) return array('error' => true, 'message' => 'Attachments must be included in an array.', 'status' => 0);
 
 				foreach($params['attachments'] as $attachment)
 				{
 
-					if( empty($attachment['content']) || empty($attachment['type']) || empty($attachment['filename']) ) return array('error' => true, 'message' => "Each attachment must be an array that includes values for 'content', 'type', and 'filename'.");
+					if( empty($attachment['content']) || empty($attachment['type']) || empty($attachment['filename']) ) return array('error' => true, 'message' => "Each attachment must be an array that includes values for 'content', 'type', and 'filename'.", 'status' => 0);
 
 					$fields['attachments'][] = array(
 						'Name' => $attachment['filename'],
@@ -139,25 +141,30 @@ if ( ! function_exists('postmark'))
 					'Content-Type: application/json',
 					"X-Postmark-Server-Token: {$params['api_key']}"
 				),
-				CURLOPT_SSL_VERIFYPEER => FALSE,
+				CURLOPT_SSL_VERIFYPEER => false,
 			));
 			
 			$response = curl_exec($curl);
-			
+			$http_code = (int)curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 			curl_close($curl);
 
 
-		// Output Response	
+		// Output	
 		
 			// cURL Failed
-			if($response === false) return array('error' => true, 'message' => 'cURL failed.');		
+			if($response === false) return array('error' => true, 'message' => 'cURL failed.', 'status' => $http_code);
 			
-			// Success
+			// cURL Success: Evaluate http response code
+			if($http_code !== 200) return array('error' => true, 'message' => 'Error: See `status` for http code.', 'status' => $http_code);	
+
+			// HTTP Code Success: Parse cURL Response
 			$response = json_decode($response, true);
-			if( isset($response['ErrorCode']) && $response['ErrorCode'] == 0 ) return array('error' => false, 'message' => 'Success!');
-			
-			// Postmark Error
-			return array('error' => true, 'message' => isset($response['Message']) ? $response['Message'] : 'Something went wrong.');
+
+				// Postmark Success
+				if( isset($response['ErrorCode']) && $response['ErrorCode'] == 0 ) return array('error' => false, 'message' => 'Success!', 'status' => $http_code);
+				
+				// Postmark Error
+				return array('error' => true, 'message' => isset($response['Message']) ? $response['Message'] : 'Something went wrong.', 'status' => $http_code);
 
 	}
 
