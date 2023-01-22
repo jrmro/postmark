@@ -28,4 +28,4 @@ $postmark = postmark([
 ]);
 ```
 ## Return Values
-Function returns an associative array with the following values: 'error' (bool) , 'message' (string). Upon success, 'error' will be false (bool)
+Function returns an associative array with the following values: 'error' (bool) , 'message' (string), 'status' (int). Upon success, 'error' will be false (bool). HTTP status code is assigned to 'status'.
