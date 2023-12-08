@@ -29,3 +29,11 @@ $postmark = postmark([
 ```
 ## Return Values
 Function returns an associative array with the following values: 'error' (bool) , 'message' (string), 'status' (int). Upon success, 'error' will be false (bool). HTTP status code is assigned to 'status'. A 'status' of 0 indicates that we did not connect with the mail server (either we didn't attempt a connection or the connection attempt was not successful).
+
+## Author
+Joseph Romero
+[https://github.com/jrmro](https://github.com/jrmro)
+
+## License
+This code is released under the MIT License.
+
